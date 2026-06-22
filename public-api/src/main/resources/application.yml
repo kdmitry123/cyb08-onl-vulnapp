@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: public-api
+
+server:
+  port: 8080
+  tomcat:
+    max-swallow-size: 100MB
+    max-http-form-post-size: 100MB
+
+internal:
+  api:
+    url: ${INTERNAL_API_URL:http://localhost:8081}
+    key: ${INTERNAL_API_KEY:SuperSecretInternalKey123!}
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    defaultModelsExpandDepth: -1
+
+# ??????????: ????????? Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+    env:
+      show-values: always
+    configprops:
+      show-values: always
+
+logging:
+  level:
+    root: INFO
+    com.vulnapp: DEBUG
