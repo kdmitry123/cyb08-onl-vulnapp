@@ -35,7 +35,6 @@ public class User {
     @Column(name = "secret_notes")
     private String secretNotes;
 
-    // Конструкторы
     public User() {
     }
 
@@ -45,7 +44,6 @@ public class User {
         this.password = password;
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }

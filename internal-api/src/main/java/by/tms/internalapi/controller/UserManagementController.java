@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 @RestController
@@ -70,7 +71,7 @@ public class UserManagementController {
                         Character.toUpperCase(key.charAt(0)) +
                         key.substring(1);
 
-                java.lang.reflect.Method setter = User.class.getMethod(
+                Method setter = User.class.getMethod(
                         setterName,
                         value != null ? value.getClass() : String.class
                 );

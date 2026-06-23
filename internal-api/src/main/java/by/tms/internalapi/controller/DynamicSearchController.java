@@ -3,6 +3,7 @@ package by.tms.internalapi.controller;
 import by.tms.internalapi.model.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.persistence.criteria.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -96,7 +97,7 @@ public class DynamicSearchController {
             jpql += " ORDER BY " + queryConfig.get("orderBy");
         }
 
-        jakarta.persistence.Query query = entityManager.createQuery(jpql);
+        Query query = entityManager.createQuery(jpql);
 
         if (queryConfig.containsKey("limit")) {
             query.setMaxResults((Integer) queryConfig.get("limit"));
@@ -144,8 +145,7 @@ public class DynamicSearchController {
             if (parsedQuery.containsKey("whereClause")) {
                 String whereClause = (String) parsedQuery.get("whereClause");
                 String sql = "SELECT * FROM users WHERE " + whereClause;
-                jakarta.persistence.Query nativeQuery =
-                        entityManager.createNativeQuery(sql, User.class);
+                Query nativeQuery = entityManager.createNativeQuery(sql, User.class);
                 result.clear();
                 for (Object obj : nativeQuery.getResultList()) {
                     User user = (User) obj;
@@ -163,4 +163,5 @@ public class DynamicSearchController {
 
         return ResponseEntity.ok(response);
     }
+
 }

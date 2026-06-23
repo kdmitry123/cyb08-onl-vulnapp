@@ -37,7 +37,6 @@ public class Task {
     @Column(name = "backup_url")
     private String backupUrl;
 
-    // Конструкторы
     public Task() {
         this.createdAt = LocalDateTime.now();
     }
@@ -49,7 +48,6 @@ public class Task {
         this.status = "TODO";
     }
 
-    // Геттеры и сеттеры
     public Long getId() {
         return id;
     }
