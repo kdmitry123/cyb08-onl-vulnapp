@@ -1,0 +1,109 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: vuln-postgres
+    environment:
+      POSTGRES_DB: taskdb
+      POSTGRES_USER: taskuser
+      POSTGRES_PASSWORD: taskpass123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskuser -d taskdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - vuln-network
+    restart: unless-stopped
+
+#  internal-api:
+#    build:
+#      context: ./internal-api
+#      dockerfile: Dockerfile
+#    container_name: vuln-internal-api
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/taskdb
+#      SPRING_DATASOURCE_USERNAME: taskuser
+#      SPRING_DATASOURCE_PASSWORD: taskpass123
+#      INTERNAL_API_KEY: SuperSecretInternalKey123!
+#      FILE_UPLOAD_DIR: /tmp/uploads
+#      JAVA_OPTS: "-Xms256m -Xmx512m"
+#    ports:
+#      - "8081:8081"
+#    volumes:
+#      - upload_data:/tmp/uploads
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#    networks:
+#      - vuln-network
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget -qO- http://localhost:8081/actuator/health || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 60s
+#
+#  public-api:
+#    build:
+#      context: ./public-api
+#      dockerfile: Dockerfile
+#    container_name: vuln-public-api
+#    environment:
+#      SPRING_PROFILES_ACTIVE: docker
+#      INTERNAL_API_URL: http://internal-api:8081
+#      INTERNAL_API_KEY: SuperSecretInternalKey123!
+#      JAVA_OPTS: "-Xms256m -Xmx512m"
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      internal-api:
+#        condition: service_healthy
+#    networks:
+#      - vuln-network
+#    restart: unless-stopped
+#    healthcheck:
+#      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health || exit 1"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 40s
+
+  # Опциональный attacker контейнер для тестирования reverse shell
+#  attacker:
+#    image: alpine:3.19
+#    container_name: attacker-machine
+#    command: |
+#      sh -c "apk add --no-cache netcat-openbsd bash curl python3 py3-pip &&
+#             pip3 install requests --break-system-packages &&
+#             echo '=====================================================' &&
+#             echo '  Attacker Machine Ready!' &&
+#             echo '  Start listener: nc -lvnp 4444' &&
+#             echo '  Test target: curl http://public-api:8080/actuator/health' &&
+#             echo '=====================================================' &&
+#             tail -f /dev/null"
+#    ports:
+#      - "4444:4444"
+#    networks:
+#      - vuln-network
+#    depends_on:
+#      - public-api
+#    profiles:
+#      - attacker
+
+volumes:
+  postgres_data:
+    driver: local
+  upload_data:
+    driver: local
+
+networks:
+  vuln-network:
+    driver: bridge
+    name: vuln-network

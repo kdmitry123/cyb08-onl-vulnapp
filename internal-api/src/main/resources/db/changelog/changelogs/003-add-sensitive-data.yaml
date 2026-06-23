@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: security-trainer
+      changes:
+        - insert:
+            tableName: audit_log
+            columns:
+              - column: { name: action, value: "SYSTEM_STARTUP" }
+              - column: { name: user_id, valueNumeric: 1 }
+              - column: { name: details, value: "System started with master encryption key: AES256-KEY-2026-SECURE" }
+        - insert:
+            tableName: audit_log
+            columns:
+              - column: { name: action, value: "CREDENTIALS_UPDATE" }
+              - column: { name: user_id, valueNumeric: 4 }
+              - column: { name: details, value: "Updated superadmin SSH key: ssh-rsa AAAAB3NzaC1yc2E... superadmin@internal" }

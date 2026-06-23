@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - include:
+      file: changelogs/001-create-tables.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/002-insert-test-data.yaml
+      relativeToChangelogFile: true
+  - include:
+      file: changelogs/003-add-sensitive-data.yaml
+      relativeToChangelogFile: true

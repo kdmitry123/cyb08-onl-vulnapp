@@ -21,6 +21,7 @@
     <properties>
         <docker.image.name>vuln-internal-api</docker.image.name>
         <docker.image.tag>${project.version}</docker.image.tag>
+        <liquibase.version>4.27.0</liquibase.version>
     </properties>
 
     <dependencies>
@@ -49,11 +50,17 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
+            <version>${liquibase.version}</version>
         </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
 
     </dependencies>

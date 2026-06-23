@@ -7,6 +7,9 @@ server:
   tomcat:
     max-swallow-size: 100MB
     max-http-form-post-size: 100MB
+  error:
+    include-message: always
+    include-stacktrace: always
 
 internal:
   api:
@@ -23,7 +26,6 @@ springdoc:
     tryItOutEnabled: true
     defaultModelsExpandDepth: -1
 
-# ??????????: ????????? Actuator endpoints
 management:
   endpoints:
     web:
@@ -32,6 +34,8 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
     env:
       show-values: always
     configprops:
@@ -40,4 +44,5 @@ management:
 logging:
   level:
     root: INFO
-    com.vulnapp: DEBUG
+    by.tms: DEBUG
+    org.springframework.web: DEBUG

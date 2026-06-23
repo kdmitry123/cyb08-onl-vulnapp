@@ -1,0 +1,92 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: security-trainer
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: username, value: "admin" }
+              - column: { name: email, value: "admin@company.com" }
+              - column: { name: password, value: "AdminSecretPass123!" }
+              - column: { name: is_admin, valueBoolean: true }
+              - column: { name: api_key, value: "ak_admin_2026_secret_key" }
+              - column: { name: secret_notes, value: "Master password for all systems: S3cur3M@st3r2026!" }
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: username, value: "john.doe" }
+              - column: { name: email, value: "john@company.com" }
+              - column: { name: password, value: "JohnPass456" }
+              - column: { name: is_admin, valueBoolean: false }
+              - column: { name: secret_notes, value: "My backup password: john_backup_2026" }
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: username, value: "jane.smith" }
+              - column: { name: email, value: "jane@company.com" }
+              - column: { name: password, value: "JaneSecret789" }
+              - column: { name: is_admin, valueBoolean: false }
+        - insert:
+            tableName: users
+            columns:
+              - column: { name: username, value: "superadmin" }
+              - column: { name: email, value: "superadmin@internal.company.com" }
+              - column: { name: password, value: "SuperSecretAdminKey2026!" }
+              - column: { name: is_admin, valueBoolean: true }
+              - column: { name: api_key, value: "sa_master_key_2026_dont_share" }
+              - column: { name: secret_notes, value: "Emergency access: use token=em3rg3ncy_4cc3ss_2026" }
+
+  - changeSet:
+      id: 2
+      author: security-trainer
+      changes:
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: title, value: "Security Audit Q2" }
+              - column: { name: description, value: "Perform quarterly security audit" }
+              - column: { name: status, value: "IN_PROGRESS" }
+              - column: { name: assignee_id, valueComputed: "(SELECT id FROM users WHERE username = 'admin')" }
+              - column: { name: internal_notes, value: "Critical: DB password is db_master_pass_2026! SSH key location: /home/admin/.ssh/id_rsa" }
+              - column: { name: scheduled_command, value: "tar -czf /backup/audit_$(date +%Y%m%d).tar.gz /var/log/audit" }
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: title, value: "API Gateway Update" }
+              - column: { name: description, value: "Update API gateway configuration" }
+              - column: { name: status, value: "TODO" }
+              - column: { name: assignee_id, valueComputed: "(SELECT id FROM users WHERE username = 'john.doe')" }
+              - column: { name: internal_notes, value: "API keys rotation planned. Old keys still active until end of month." }
+              - column: { name: backup_url, value: "http://backup-server.internal/backups/api-gateway-config" }
+        - insert:
+            tableName: tasks
+            columns:
+              - column: { name: title, value: "Database Migration" }
+              - column: { name: description, value: "Migrate user data to new schema" }
+              - column: { name: status, value: "TODO" }
+              - column: { name: assignee_id, valueComputed: "(SELECT id FROM users WHERE username = 'jane.smith')" }
+              - column: { name: internal_notes, value: "Temp workaround: use master_key_temp_2024 for emergency access during migration" }
+
+  - changeSet:
+      id: 3
+      author: security-trainer
+      changes:
+        - insert:
+            tableName: api_keys
+            columns:
+              - column: { name: service_name, value: "payment-gateway" }
+              - column: { name: api_key, value: "pg_live_sk_2026_super_secret_key_123456789" }
+              - column: { name: is_active, valueBoolean: true }
+        - insert:
+            tableName: api_keys
+            columns:
+              - column: { name: service_name, value: "email-service" }
+              - column: { name: api_key, value: "email_api_master_key_2026" }
+              - column: { name: is_active, valueBoolean: true }
+        - insert:
+            tableName: api_keys
+            columns:
+              - column: { name: service_name, value: "monitoring-system" }
+              - column: { name: api_key, value: "monitor_prod_key_2026" }
+              - column: { name: is_active, valueBoolean: true }

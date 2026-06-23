@@ -1,0 +1,155 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1
+      author: security-trainer
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: username
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  name: password
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_admin
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+              - column:
+                  name: api_key
+                  type: VARCHAR(512)
+              - column:
+                  name: secret_notes
+                  type: TEXT
+
+  - changeSet:
+      id: 2
+      author: security-trainer
+      changes:
+        - createTable:
+            tableName: tasks
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: title
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  defaultValue: 'TODO'
+              - column:
+                  name: assignee_id
+                  type: BIGINT
+                  constraints:
+                    foreignKeyName: fk_task_assignee
+                    references: users(id)
+              - column:
+                  name: created_at
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: internal_notes
+                  type: TEXT
+              - column:
+                  name: scheduled_command
+                  type: VARCHAR(1024)
+              - column:
+                  name: backup_url
+                  type: VARCHAR(1024)
+
+  - changeSet:
+      id: 3
+      author: security-trainer
+      changes:
+        - createTable:
+            tableName: api_keys
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: service_name
+                  type: VARCHAR(255)
+              - column:
+                  name: api_key
+                  type: VARCHAR(512)
+              - column:
+                  name: is_active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+
+  - changeSet:
+      id: 4
+      author: security-trainer
+      changes:
+        - createTable:
+            tableName: audit_log
+            columns:
+              - column:
+                  name: id
+                  type: BIGSERIAL
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: action
+                  type: VARCHAR(255)
+              - column:
+                  name: user_id
+                  type: BIGINT
+              - column:
+                  name: details
+                  type: TEXT
+              - column:
+                  name: timestamp
+                  type: TIMESTAMP
+                  defaultValueComputed: CURRENT_TIMESTAMP
+
+  - changeSet:
+      id: 5
+      author: security-trainer
+      changes:
+        - createIndex:
+            tableName: tasks
+            indexName: idx_tasks_assignee
+            columns:
+              - column:
+                  name: assignee_id
+        - createIndex:
+            tableName: users
+            indexName: idx_users_username
+            columns:
+              - column:
+                  name: username

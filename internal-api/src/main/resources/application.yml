@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: internal-api
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/taskdb}
+    username: ${SPRING_DATASOURCE_USERNAME:taskuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:taskpass123}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: true
+    open-in-view: false
+
+  liquibase:
+    change-log: classpath:db/changelog/master.yaml
+    enabled: true
+    default-schema: public
+
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8081
+  error:
+    include-message: always
+    include-stacktrace: always
+
+internal:
+  api:
+    key: ${INTERNAL_API_KEY:SuperSecretInternalKey123!}
+
+file:
+  upload:
+    dir: ${FILE_UPLOAD_DIR:/tmp/uploads}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    by.tms: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
