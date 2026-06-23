@@ -23,16 +23,16 @@ public class JwtAuthController {
     private static final Map<String, String> USER_CREDENTIALS = new HashMap<>();
 
     static {
-        REFRESH_TOKENS.put("admin", "rt_admin_super_secret_2024");
-        REFRESH_TOKENS.put("john.doe", "rt_john_2024");
-        REFRESH_TOKENS.put("jane.smith", "rt_jane_2024");
-        REFRESH_TOKENS.put("superadmin", "rt_superadmin_2024");
+        REFRESH_TOKENS.put("admin", "rt_admin_super_secret_2026");
+        REFRESH_TOKENS.put("john.doe", "rt_john_2026");
+        REFRESH_TOKENS.put("jane.smith", "rt_jane_2026");
+        REFRESH_TOKENS.put("superadmin", "rt_superadmin_2026");
 
         // УЯЗВИМОСТЬ: Хранение паролей в открытом виде
         USER_CREDENTIALS.put("admin", "admin123");
         USER_CREDENTIALS.put("john.doe", "password123");
         USER_CREDENTIALS.put("jane.smith", "password123");
-        USER_CREDENTIALS.put("superadmin", "SuperAdmin2024!");
+        USER_CREDENTIALS.put("superadmin", "SuperAdmin2026!");
     }
 
     public JwtAuthController(JwtConfiguration.JwtTokenGenerator tokenGenerator) {
