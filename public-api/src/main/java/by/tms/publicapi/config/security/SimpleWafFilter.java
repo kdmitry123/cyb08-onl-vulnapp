@@ -8,18 +8,15 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Component
 public class SimpleWafFilter implements Filter {
 
+    // Только базовые ключевые слова
     private static final List<String> BLOCKED_KEYWORDS = Arrays.asList(
-            "union", "select", "insert", "delete", "drop", "exec", "script",
-            "../", "etc/passwd", "cmd=", "|", ";", "&&"
+            "union select", "1=1", "1=2", "' or '", "' and '",
+            "or 1=1", "and 1=1", "or '1'='1", "and '1'='1"
     );
-
-    private static final Pattern SQL_INJECTION_PATTERN =
-            Pattern.compile("(?i)(\\b(union|select|insert|delete|drop|exec)\\b)");
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response,
@@ -28,41 +25,53 @@ public class SimpleWafFilter implements Filter {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpServletResponse httpResponse = (HttpServletResponse) response;
 
-        // УЯЗВИМОСТЬ №1: WAF можно обойти через заголовок X-Forwarded-For
+        // УЯЗВИМОСТЬ: Bypass через X-Forwarded-For
         String bypassHeader = httpRequest.getHeader("X-Forwarded-For");
         if (bypassHeader != null && bypassHeader.equals("127.0.0.1")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // УЯЗВИМОСТЬ №2: WAF можно обойти через заголовок X-Original-URL
+        // УЯЗВИМОСТЬ: Bypass через X-Original-URL
         String originalUrl = httpRequest.getHeader("X-Original-URL");
         if (originalUrl != null && originalUrl.contains("internal")) {
             chain.doFilter(request, response);
             return;
         }
 
-        // УЯЗВИМОСТЬ №3: Проверяет только query параметры, но не body
+        // УЯЗВИМОСТЬ: Проверяем только GET запросы
         String queryString = httpRequest.getQueryString();
-        if (queryString != null) {
-            // УЯЗВИМОСТЬ №4: Не проверяет URL-encoded значения
+        if (queryString != null && "GET".equalsIgnoreCase(httpRequest.getMethod())) {
+
+            // Декодируем URL
+            String decodedQuery;
+            try {
+                decodedQuery = java.net.URLDecoder.decode(queryString, "UTF-8");
+            } catch (Exception e) {
+                decodedQuery = queryString;
+            }
+
+            // УЯЗВИМОСТЬ: Проверяем только точные совпадения в нижнем регистре
+            String lowerQuery = decodedQuery.toLowerCase();
+
             for (String keyword : BLOCKED_KEYWORDS) {
-                if (queryString.toLowerCase().contains(keyword.toLowerCase())) {
+                if (lowerQuery.contains(keyword)) {
                     httpResponse.setStatus(403);
                     httpResponse.setContentType("application/json");
                     httpResponse.getWriter().write(
-                            "{\"error\": \"Request blocked by WAF\", \"keyword\": \"" +
-                                    keyword + "\"}"
+                            String.format(
+                                    "{\"error\":\"Request blocked by WAF\",\"keyword\":\"%s\"}",
+                                    keyword
+                            )
                     );
                     return;
                 }
             }
         }
 
-        // УЯЗВИМОСТЬ №5: Пропускает все POST/PUT запросы без проверки body
+        // УЯЗВИМОСТЬ: Пропускаем все POST запросы
         if ("POST".equalsIgnoreCase(httpRequest.getMethod()) ||
-                "PUT".equalsIgnoreCase(httpRequest.getMethod()) ||
-                "DELETE".equalsIgnoreCase(httpRequest.getMethod())) {
+                "PUT".equalsIgnoreCase(httpRequest.getMethod())) {
             chain.doFilter(request, response);
             return;
         }
