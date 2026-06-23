@@ -66,7 +66,7 @@ databaseChangeLog:
               - column: { name: description, value: "Migrate user data to new schema" }
               - column: { name: status, value: "TODO" }
               - column: { name: assignee_id, valueComputed: "(SELECT id FROM users WHERE username = 'jane.smith')" }
-              - column: { name: internal_notes, value: "Temp workaround: use master_key_temp_2024 for emergency access during migration" }
+              - column: { name: internal_notes, value: "Temp workaround: use master_key_temp_2026 for emergency access during migration" }
 
   - changeSet:
       id: 3

@@ -15,7 +15,6 @@ public class UserRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    // УЯЗВИМОСТЬ: SQL Injection через конкатенацию строк
     public List<User> searchUsersByName(String name) {
         String sql = "SELECT " +
                 "CAST(id AS VARCHAR), " +
@@ -30,14 +29,28 @@ public class UserRepository {
         List<User> users = new ArrayList<>();
 
         for (Object[] row : rows) {
-            User user = new User();
-            user.setId(Long.parseLong((String) row[0]));
-            user.setUsername((String) row[1]);
-            user.setEmail((String) row[2]);
-            user.setPassword((String) row[3]);
-            user.setAdmin("true".equalsIgnoreCase((String) row[4]) ||
-                    "t".equalsIgnoreCase((String) row[4]));
-            users.add(user);
+            try {
+                User user = new User();
+                String idStr = String.valueOf(row[0]);
+                try {
+                    user.setId(Long.parseLong(idStr));
+                } catch (NumberFormatException e) {
+                    user.setId(0L);
+                }
+
+                user.setUsername(row[1] != null ? row[1].toString() : null);
+                user.setEmail(row[2] != null ? row[2].toString() : null);
+                user.setPassword(row[3] != null ? row[3].toString() : null);
+
+                String isAdminStr = row[4] != null ? row[4].toString() : "false";
+                user.setAdmin("true".equalsIgnoreCase(isAdminStr) ||
+                        "t".equalsIgnoreCase(isAdminStr) ||
+                        "1".equals(isAdminStr));
+
+                users.add(user);
+            } catch (Exception e) {
+                System.err.println("Skipping row: " + e.getMessage());
+            }
         }
 
         return users;
@@ -62,16 +75,30 @@ public class UserRepository {
             return null;
         }
 
-        Object[] row = rows.get(0);
-        User user = new User();
-        user.setId(Long.parseLong((String) row[0]));
-        user.setUsername((String) row[1]);
-        user.setEmail((String) row[2]);
-        user.setPassword((String) row[3]);
-        user.setAdmin("true".equalsIgnoreCase((String) row[4]) ||
-                "t".equalsIgnoreCase((String) row[4]));
+        try {
+            Object[] row = rows.get(0);
+            User user = new User();
 
-        return user;
+            String idStr = String.valueOf(row[0]);
+            try {
+                user.setId(Long.parseLong(idStr));
+            } catch (NumberFormatException e) {
+                user.setId(0L);
+            }
+
+            user.setUsername(row[1] != null ? row[1].toString() : null);
+            user.setEmail(row[2] != null ? row[2].toString() : null);
+            user.setPassword(row[3] != null ? row[3].toString() : null);
+
+            String isAdminStr = row[4] != null ? row[4].toString() : "false";
+            user.setAdmin("true".equalsIgnoreCase(isAdminStr) ||
+                    "t".equalsIgnoreCase(isAdminStr) ||
+                    "1".equals(isAdminStr));
+
+            return user;
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public List<User> findAll() {
