@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -74,6 +75,26 @@ public class FileController {
             return ResponseEntity.ok(info.toString());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/resource")
+    @Operation(summary = "Read resource from classpath (Information disclosure)")
+    public ResponseEntity<String> readResource(
+            @Parameter(description = "Resource path in classpath")
+            @RequestParam String resource) {
+        // УЯЗВИМОСТЬ: Чтение произвольных ресурсов из classpath
+        try {
+            ClassLoader classLoader = getClass().getClassLoader();
+            InputStream inputStream = classLoader.getResourceAsStream(resource);
+
+            if (inputStream != null) {
+                String content = new String(inputStream.readAllBytes());
+                return ResponseEntity.ok(content);
+            }
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
     }
 
 }

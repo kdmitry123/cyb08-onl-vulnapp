@@ -1,5 +1,7 @@
 package by.tms.publicapi.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.thoughtworks.xstream.XStream;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -129,6 +131,45 @@ public class UserController {
                     document.getDocumentElement().getTextContent());
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("XML Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/deserialize-json")
+    @Operation(summary = "Deserialize JSON with polymorphic types (Jackson Deserialization)")
+    public ResponseEntity<String> deserializeJson(
+            @Parameter(description = "JSON with @class type")
+            @RequestBody String jsonData) {
+        // УЯЗВИМОСТЬ: Jackson polymorphic deserialization
+        // Можно указать @class для выполнения произвольного кода
+        try {
+            ObjectMapper mapper =
+                    new ObjectMapper();
+
+            // УЯЗВИМОСТЬ: Включаем default typing
+            mapper.enableDefaultTyping(
+                    ObjectMapper.DefaultTyping.NON_FINAL
+            );
+
+            Object obj = mapper.readValue(jsonData, Object.class);
+            return ResponseEntity.ok("Deserialized: " + obj.toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/deserialize-xml")
+    @Operation(summary = "Deserialize XML (XStream Deserialization)")
+    public ResponseEntity<String> deserializeXml(
+            @Parameter(description = "XML with serialized object")
+            @RequestBody String xmlData) {
+        // УЯЗВИМОСТЬ: XStream deserialization
+        try {
+            XStream xstream = new XStream();
+            // УЯЗВИМОСТЬ: Не ограничиваем типы
+            Object obj = xstream.fromXML(xmlData);
+            return ResponseEntity.ok("Deserialized: " + obj.toString());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
 }

