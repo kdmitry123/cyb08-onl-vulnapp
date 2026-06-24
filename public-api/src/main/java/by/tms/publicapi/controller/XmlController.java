@@ -59,7 +59,6 @@ public class XmlController {
                     new InputSource(new StringReader(xmlData))
             );
 
-            // Конвертируем обратно для отображения содержимого
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             StringWriter writer = new StringWriter();
             transformer.transform(new DOMSource(document), new StreamResult(writer));
@@ -149,7 +148,6 @@ public class XmlController {
 
             DocumentBuilder builder = factory.newDocumentBuilder();
 
-            // Добавляем обработчик ошибок для получения информации о валидации
             builder.setErrorHandler(new ErrorHandler() {
                 @Override
                 public void warning(SAXParseException exception) {

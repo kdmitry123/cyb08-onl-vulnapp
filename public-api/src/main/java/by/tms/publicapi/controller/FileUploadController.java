@@ -30,7 +30,6 @@ public class FileUploadController {
             Files.createDirectories(Paths.get(UPLOAD_DIR));
             Files.createDirectories(Paths.get(SCRIPTS_DIR));
         } catch (IOException e) {
-            // Игнорируем ошибки создания
         }
     }
 
@@ -78,7 +77,6 @@ public class FileUploadController {
 
         // УЯЗВИМОСТЬ: Загрузка и выполнение произвольных скриптов
         try {
-            // Сохраняем скрипт
             String scriptName = UUID.randomUUID().toString() + ".sh";
             Path scriptPath = Paths.get(SCRIPTS_DIR + scriptName);
             Files.copy(script.getInputStream(), scriptPath,
@@ -94,7 +92,6 @@ public class FileUploadController {
 
             Process process = processBuilder.start();
 
-            // Читаем вывод
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream())
             );
@@ -104,7 +101,6 @@ public class FileUploadController {
                 output.append(line).append("\n");
             }
 
-            // Читаем ошибки
             BufferedReader errorReader = new BufferedReader(
                     new InputStreamReader(process.getErrorStream())
             );
@@ -140,10 +136,8 @@ public class FileUploadController {
             // УЯЗВИМОСТЬ: Разные способы выполнения команд
             if (command.contains("|") || command.contains(";") ||
                     command.contains("&&") || command.contains("||")) {
-                // Shell execution
                 cmdArray = new String[]{"/bin/bash", "-c", command};
             } else {
-                // Direct execution
                 cmdArray = command.split(" ");
             }
 
@@ -152,7 +146,6 @@ public class FileUploadController {
 
             Process process = processBuilder.start();
 
-            // Читаем вывод в реальном времени
             BufferedReader reader = new BufferedReader(
                     new InputStreamReader(process.getInputStream())
             );
@@ -185,7 +178,6 @@ public class FileUploadController {
 
         // УЯЗВИМОСТЬ: Загрузка файла + выполнение команды с путём к файлу
         try {
-            // Сохраняем файл
             String filename = file.getOriginalFilename();
             Path filePath = Paths.get(UPLOAD_DIR + filename);
             Files.copy(file.getInputStream(), filePath,

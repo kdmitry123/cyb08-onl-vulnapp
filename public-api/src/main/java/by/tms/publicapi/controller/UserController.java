@@ -18,6 +18,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 @RestController
@@ -42,10 +44,19 @@ public class UserController {
     public ResponseEntity<String> importProfile(
             @Parameter(description = "URL to fetch profile from")
             @RequestParam String url) {
-        // УЯЗВИМОСТЬ: SSRF - нет валидации URL
-        // Можно указать: file:///etc/passwd, http://internal-api:8081/...
         try {
-            String response = restTemplate.getForObject(url, String.class);
+            String response;
+
+            // УЯЗВИМОСТЬ: Поддержка file:// протокола для SSRF
+            if (url.startsWith("file://") || url.startsWith("file:/")) {
+                String path = url.replaceFirst("^file:(//)?", "/");
+                if (path.matches("^/[A-Za-z]:.*")) {
+                    path = path.substring(1);
+                }
+                response = new String(Files.readAllBytes(Paths.get(path)));
+            } else {
+                response = restTemplate.getForObject(url, String.class);
+            }
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(

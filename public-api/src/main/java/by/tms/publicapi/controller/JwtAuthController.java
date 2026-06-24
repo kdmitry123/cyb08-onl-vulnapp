@@ -139,13 +139,11 @@ public class JwtAuthController {
             Map<String, Object> response = new HashMap<>();
 
             if (parts.length >= 2) {
-                // Декодируем header
                 String header = new String(
                         Base64.getUrlDecoder().decode(parts[0])
                 );
                 response.put("header", header);
 
-                // Декодируем payload
                 String payload = new String(
                         Base64.getUrlDecoder().decode(parts[1])
                 );

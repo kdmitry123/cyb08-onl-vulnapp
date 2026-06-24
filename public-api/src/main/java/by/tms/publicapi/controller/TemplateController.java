@@ -61,7 +61,6 @@ public class TemplateController {
                 return ResponseEntity.ok("JavaScript Result: " + result);
             }
         } catch (Exception e) {
-            // Переходим к следующему методу
         }
 
         // Попытка 2: Spring Expression Language (SpEL)
@@ -105,7 +104,7 @@ public class TemplateController {
                     }
 
                     process.waitFor();
-                    return ResponseEntity.ok("Command Result:\n" + output.toString());
+                    return ResponseEntity.ok("Command Result:\n" + output);
                 } catch (Exception ex) {
                     return ResponseEntity.badRequest().body(
                             "Command execution failed: " + ex.getMessage()
@@ -142,7 +141,6 @@ public class TemplateController {
                     return ResponseEntity.ok("JavaScript Result: " + result);
                 }
             } else if ("python".equalsIgnoreCase(language) || "py".equalsIgnoreCase(language)) {
-                // Сохраняем код во временный файл и выполняем
                 Path tempFile = Files.createTempFile("script_", ".py");
                 Files.writeString(tempFile, code);
 
@@ -163,7 +161,6 @@ public class TemplateController {
 
                 return ResponseEntity.ok("Python Result:\n" + output);
             } else {
-                // Shell execution
                 Path tempFile = Files.createTempFile("script_", ".sh");
                 Files.writeString(tempFile, code);
                 tempFile.toFile().setExecutable(true);
@@ -200,7 +197,6 @@ public class TemplateController {
     private String processTemplate(String template, Map<String, Object> variables) {
         String result = template;
 
-        // Заменяем переменные {{variable}}
         if (variables != null) {
             for (Map.Entry<String, Object> entry : variables.entrySet()) {
                 result = result.replace(
@@ -236,8 +232,8 @@ public class TemplateController {
     }
 
     private Object evaluateExpressionValue(String expression) {
-        // УЯЗВИМОСТЬ: Выполнение различных типов выражений
 
+        // УЯЗВИМОСТЬ: Выполнение различных типов выражений
         if (expression.startsWith("system:")) {
             String property = expression.substring(7);
             return System.getProperty(property, "Property not found");
@@ -248,7 +244,6 @@ public class TemplateController {
             return value != null ? value : "Environment variable not found";
 
         } else if (expression.startsWith("exec:")) {
-            // Выполнение команд ОС
             String command = expression.substring(5);
             try {
                 Process process = Runtime.getRuntime().exec(
