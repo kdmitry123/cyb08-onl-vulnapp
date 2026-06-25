@@ -16,5 +16,5 @@ RUN mkdir -p /tmp/uploads /tmp/scripts && \
     chmod 777 /tmp/uploads /tmp/scripts && \
     chown -R appuser:appgroup /tmp /app
 USER appuser
-EXPOSE 8081
+EXPOSE 8082
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar app.jar"]

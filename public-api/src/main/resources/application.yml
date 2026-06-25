@@ -3,7 +3,7 @@ spring:
     name: public-api
 
 server:
-  port: 8080
+  port: 8080  # Порт внутри контейнера
   tomcat:
     max-swallow-size: 100MB
     max-http-form-post-size: 100MB
@@ -13,7 +13,7 @@ server:
 
 internal:
   api:
-    url: ${INTERNAL_API_URL:http://localhost:8081}
+    url: ${INTERNAL_API_URL:http://localhost:8082}
     key: ${INTERNAL_API_KEY:SuperSecretInternalKey123!}
 
 springdoc:
